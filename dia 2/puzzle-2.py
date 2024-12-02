@@ -63,9 +63,9 @@ def remover_nivel(datos, lista_cumple):
     lista_remover = lista_cumple.copy()
     for i, reporte in enumerate(datos):
         if not lista_remover[i]:
-            for nivel in reporte:
-                reporte_modificado = reporte.copy()  # Crear una copia del reporte original
-                reporte_modificado.remove(nivel)  # Eliminar solo la primera ocurrencia de "nivel"
+            for j in range(len(reporte)):  # Iterar sobre los índices de niveles en reporte
+                # Crear una copia del reporte y eliminar el nivel en la posición j
+                reporte_modificado = reporte[:j] + reporte[j+1:]
                 
                 # Verificar las condiciones sobre la lista modificada
                 if no_salta(reporte_modificado):
@@ -75,7 +75,7 @@ def remover_nivel(datos, lista_cumple):
     return lista_remover
         
 #%%
-test = [[7,6,4,2,1], [1,2,7,8,9], [9,7,6,2,1], [1,3,2,4,5], [8,6,4,4,1], [1,3,6,7,9,9], [], [1,1,2,3,4,5,6]]   
+test = [[7,6,7,4,2,1], [1,2,7,8,9], [9,7,6,2,1], [1,3,2,4,5], [8,6,4,4,1], [1,3,6,7,9,]]   
 
 lista_saltos = saltos_nivel(test)
 lista_crece_decrece = decrece_o_crece(test, lista_saltos)
