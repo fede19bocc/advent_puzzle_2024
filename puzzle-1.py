@@ -1,7 +1,7 @@
 
 def leer_txt(archivo):
     '''
-    Devuelve el texto adentro del archivo
+    Devuelve dos listas con datos enteros
     '''
     lista_1 = []
     lista_2 = []
@@ -16,6 +16,9 @@ def leer_txt(archivo):
         return lista_1, lista_2
 
 def distancia_entre_listas(lista_1, lista_2):
+    '''
+    Mide la distancia entre dos lista
+    '''
     a = lista_1.copy()
     b = lista_2.copy()
     distancias = []
@@ -29,6 +32,11 @@ def distancia_entre_listas(lista_1, lista_2):
     return sum(distancias)
 
 def puntaje_de_similitud(lista_1, lista_2):
+    '''
+    Calcula un puntaje de similitud entre dos listas, cada dato de la lista 1 lo multiplica por la cantidad 
+    de veces que esta en la lista 2. 
+    Devuelve la suma de esos puntajes
+    '''
     puntaje = []
     cantidades_lista_2 = dicc_contar_num(lista_2)
 
@@ -40,6 +48,9 @@ def puntaje_de_similitud(lista_1, lista_2):
     return sum(puntaje)
 
 def dicc_contar_num(lista):
+    '''
+    Cuenta la cantidad de veces que se repite un dato en una lista
+    '''
     contar = {}
     for i in lista:
         if i not in contar:
@@ -60,7 +71,7 @@ dicc = dicc_contar_num(lista_2)
 #     if i in dicc:
 #         print(dicc[i])
 
-print(lista_1)
+# print(lista_1)
 
 print("distancia entre listas" , distancia_entre_listas(lista_1, lista_2))
 print("puntaje de similitud: " , puntaje_de_similitud(lista_1, lista_2))
