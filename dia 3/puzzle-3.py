@@ -24,37 +24,34 @@ def interpretar(memorias, regex):
         multiplicaciones.append(aux)
     return multiplicaciones
 
-def multiplicarYsumar(multiplicaciones, formato):
+def multiplicarYsumar(listas, formato):
     valores = []
-    for lista in multiplicaciones:
+    condicion = True
+    for lista in listas:
         for l in lista:
-           aux = re.findall(formato, l)
-           valores.append(int(aux[0])*int(aux[1]))
+            #si aparece don't anula la multiplicacion
+            if l == "don't()":
+                condicion = False
+            elif l == "do()":
+                condicion = True
+            # si esta habilitada la multipicacion y no son don' o do 
+            if condicion and l != "don't()" and l != "do()": 
+                aux = re.findall(formato, l)
+                valores.append(int(aux[0])*int(aux[1]))
     return valores
-
-def memoriaDañada(datos, regex):
-    dañado = []
-    for memoria in datos:
-        aux = re.split(regex, memoria)
-        dañado.append(aux)
-    return dañado
 
 #%%
 
 datos = leer_txt('input.txt')
 # regex1 = '(?i)(mul\([0-9]*\,[0-9]*\))+' # agrupaba dos mul()mul() juntos
-regex2 = '(?i)mul\([0-9]*\,[0-9]*\)' #separa individualmente cada mul()
-# multiplicaciones1 = interpretar(datos, regex1)
-multiplicaciones2 = interpretar(datos, regex2)
-# for i in range(len(multiplicaciones1)):
-#     print(i)
-#     for mem in multiplicaciones2[i]:
-#         if mem not in multiplicaciones1[i]:
-#             print(mem)
+regex = '(?i)mul\([0-9]*\,[0-9]*\)' #separa individualmente cada mul()
+multiplicaciones = interpretar(datos, regex)
+
 formato = '[0-9]+'
-
-valores = multiplicarYsumar(multiplicaciones2, formato)
-
-dañado = memoriaDañada(datos, regex2)
-
-print(sum(valores))
+valores = multiplicarYsumar(multiplicaciones, formato)
+print("Valores: ", sum(valores))
+#%%
+regex_cond = 'mul\([0-9]*\,[0-9]*\)|do\(\)|don\'t\(\)'
+mult_cond = interpretar(datos, regex_cond)
+valores_cond = multiplicarYsumar(mult_cond, formato)
+print("Valores con condicionales: ", sum(valores_cond))
