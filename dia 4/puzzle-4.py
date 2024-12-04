@@ -25,56 +25,74 @@ def procesar_datos(datos):
             aux.append(list(i))
     return pd.DataFrame(aux)
 
-def vertical(datos):
+def invertir_columnas(df):
+    df_invertido_columnas = df.iloc[:, ::-1]
+    return df_invertido_columnas
+
+def invertir_filas(df):
+    df_invertido_filas = df.iloc[::-1].reset_index(drop=True)
+    return df_invertido_filas
+
+def diagonalizar(df):
+    df_diagonal = pd.DataFrame(".", index=range(len(df)), columns=range(len(df.columns)))
+    contador_f = 0
+    contador_c = 0
+    
+    for j in range(len(df.columns)):  
+        for i in range(len(df)):
+            if i >= j:
+                df_diagonal.iloc[i, j] = df.iloc[i, j]
+            if i < j:
+                df_diagonal.iloc[i+1, j] = df.iloc[i, j]
+    return df_diagonal
+        
+    pass
+def vertical(datos, invertir = False):
+    if invertir:
+        datos = invertir_filas(datos)
     XMAS = 0
     for columna in datos:
-        x = False
-        m = False
-        a = False
-        s = False
+        x = m = a = False
         for celda in datos[columna]:
-            if celda == "X" and not x:
+            if celda == "X":
                 x = True
-            if celda == "M" and not m and x:
+                m = a = False
+            elif celda == "M" and x:
                 m = True
-            if celda == "A" and not a and x and m:
-                a = True
-            if celda == "S" and not s and x and m and a:
-                s = True
-            if x and m and a and s:
-                XMAS += 1
-                x = False
-                m = False
                 a = False
-                s = False
+            elif celda == "A" and x and m:
+                a = True
+            elif celda == "S" and x and m and a:
+                XMAS += 1
+                x = m = a = False 
+            else:
+                x = m = a = False 
     return XMAS
 
-def horizontal(datos): # cuenta de mas cuadno la palabra es XAMAS, hay que resetear los bool cuando la siguiente no es la que corresponde
+def horizontal(datos, invertir = False):
+    if invertir:
+        datos = invertir_columnas(datos)
     XMAS = 0
     for fila in range(len(datos)):
-        x = False
-        m = False
-        a = False
-        s = False
+        x = m = a = False
         for celda in datos.iloc[fila]:
-            if celda == "X" and not x:
+            if celda == "X":
                 x = True
-            if celda == "M" and not m and x:
+                m = a = False
+            elif celda == "M" and x:
                 m = True
-            if celda == "A" and not a and x and m:
-                a = True
-            if celda == "S" and not s and x and m and a:
-                s = True
-            if x and m and a and s:
-                XMAS += 1
-                x = False
-                m = False
                 a = False
-                s = False
+            elif celda == "A" and x and m:
+                a = True
+            elif celda == "S" and x and m and a:
+                XMAS += 1
+                x = m = a = False 
+            else:
+                x = m = a = False 
     return XMAS
 
 #%% datos de prueba
-test = [["MMMSXMASM"],
+test = [["MMMSXXMASM"],
         ["MSAMXMSMSA"],
         ["AMXSXMAAMM"],
         ["MSAMASMSMX"],
@@ -86,8 +104,11 @@ test = [["MMMSXMASM"],
         ["MXMXAXMASX"]]
 
 datos_test = procesar_datos(test)
-print(vertical(datos_test))
-print(horizontal(datos_test))
+print("Verticales de arriba a abajo: ", vertical(datos_test))
+print("Verticales de abajo a arriba: ", vertical(datos_test, True))
+print("Horizontales de izq a der: ", horizontal(datos_test))
+print("Horizontales de der a izq: ", horizontal(datos_test, True))
+
 #%% input del puzzle
 txt = leer_txt(".\input.txt")
 datos = procesar_datos(txt)
