@@ -92,6 +92,24 @@ def horizontal(datos, invertir = False):
                 x = m = a = False 
     return XMAS
 
+def horizontal_MAS(datos, invertir = False):
+    if invertir:
+        datos = invertir_columnas(datos)
+    MAS = 0
+    for fila in range(len(datos)):
+        m = a = False
+        for celda in datos.iloc[fila]:
+            if celda == "M":
+                m = True
+                a = False
+            elif celda == "A" and m and not a:
+                a = True
+            elif celda == "S" and m and a:
+                MAS += 1
+                m = a = False 
+            else:
+                m = a = False 
+    return MAS
 #%% datos de prueba
 test = [["MMMSXXMASM"],
         ["MSAMXMSMSA"],
@@ -120,6 +138,9 @@ suma = [vertical(datos_test),
         horizontal(diag, True)]
 
 print("XMAS totales: ", sum(suma))
+
+print(horizontal_MAS(diag))
+print(horizontal_MAS(diag, True))
 
 
 #%% input del puzzle
