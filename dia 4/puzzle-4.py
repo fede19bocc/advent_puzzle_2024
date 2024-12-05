@@ -6,6 +6,7 @@ This is a temporary script file.
 """
 # puzzle dia 4
 import pandas as pd
+import numpy as np
 
 def leer_txt(archivo):
     '''
@@ -14,7 +15,7 @@ def leer_txt(archivo):
     lista = []
     with open(archivo, "r") as f:
         for line in f.readlines():
-            lista.append(line)
+            lista.append([line])
     return lista
 
 def procesar_datos(datos):
@@ -33,33 +34,20 @@ def invertir_filas(df):
     df_invertido_filas = df.iloc[::-1].reset_index(drop=True)
     return df_invertido_filas
 
-def diagonal(df):
-  
-    XMAS = 0
-    for columna in datos:
-        x = m = a = False
-        for celda in datos[columna]:
-            if celda == "X":
-                x = True
-                m = a = False
-                continue
-            elif celda == "M" and x:
-                m = True
-                a = False
-                continue
-            elif celda == "A" and x and m:
-                a = True
-                continue
-            elif celda == "S" and x and m and a:
-                XMAS += 1
-                x = m = a = False
-                continue
-            else:
-                x = m = a = False
-                continue
-    return XMAS
-        
-    pass
+def diagonal(datos):
+    datos_inv = invertir_filas(datos)
+    diagonal = []
+    for i in range(len(datos)):
+        if i == 0:
+            diagonal.append(np.diag(datos))
+            diagonal.append(np.diag(datos_inv))
+        else:
+            diagonal.append(np.diag(datos, i))
+            diagonal.append(np.diag(datos, -i))
+            diagonal.append(np.diag(datos_inv, i))
+            diagonal.append(np.diag(datos_inv, -i))
+    return diagonal
+
 def vertical(datos, invertir = False):
     if invertir:
         datos = invertir_filas(datos)
@@ -70,10 +58,10 @@ def vertical(datos, invertir = False):
             if celda == "X":
                 x = True
                 m = a = False
-            elif celda == "M" and x:
+            elif celda == "M" and x and not m:
                 m = True
                 a = False
-            elif celda == "A" and x and m:
+            elif celda == "A" and x and m and not a:
                 a = True
             elif celda == "S" and x and m and a:
                 XMAS += 1
@@ -92,10 +80,10 @@ def horizontal(datos, invertir = False):
             if celda == "X":
                 x = True
                 m = a = False
-            elif celda == "M" and x:
+            elif celda == "M" and x and not m:
                 m = True
                 a = False
-            elif celda == "A" and x and m:
+            elif celda == "A" and x and m and not a:
                 a = True
             elif celda == "S" and x and m and a:
                 XMAS += 1
@@ -117,16 +105,35 @@ test = [["MMMSXXMASM"],
         ["MXMXAXMASX"]]
 
 datos_test = procesar_datos(test)
-print("Verticales de arriba a abajo: ", vertical(datos_test))
-print("Verticales de abajo a arriba: ", vertical(datos_test, True))
-print("Horizontales de izq a der: ", horizontal(datos_test))
-print("Horizontales de der a izq: ", horizontal(datos_test, True))
-print("Diagonales hacia abajo: ", diagonal(datos_test))
+# print("Verticales de arriba a abajo: ", vertical(datos_test))
+# print("Verticales de abajo a arriba: ", vertical(datos_test, True))
+# print("Horizontales de izq a der: ", horizontal(datos_test))
+# print("Horizontales de der a izq: ", horizontal(datos_test, True))
+# print("Diagonales hacia abajo: ", diagonal(datos_test))
+diag = pd.DataFrame(diagonal(datos_test))
+
+suma = [vertical(datos_test), 
+        vertical(datos_test, True),
+        horizontal(datos_test),
+        horizontal(datos_test, True),
+        horizontal(diag),
+        horizontal(diag, True)]
+
+print("XMAS totales: ", sum(suma))
+
 
 #%% input del puzzle
-txt = leer_txt(".\input.txt")
+txt = leer_txt("input.txt")
 datos = procesar_datos(txt)
+diag = pd.DataFrame(diagonal(datos))
 
+suma = [vertical(datos), 
+        vertical(datos, True),
+        horizontal(datos),
+        horizontal(datos, True),
+        horizontal(diag),
+        horizontal(diag, True)]
+print("XMAS totales: ", sum(suma))
 
 #%% solucion hecha por wleftwich
 # https://github.com/wleftwich
