@@ -88,16 +88,20 @@ def ordenar_updates(paginas, updates, mapa_reglas):
     paginas_reordenadas = []
     for i, pagina in enumerate(paginas):
         if not updates[i]:
-            for i, u in enumerate(pagina):
+            # print(f"Procesando página {i}: {pagina}")
+            for k, u in enumerate(pagina):
+                # print(f"Elemento {u} en índice {k} de la página")
                 if procesar_paginas([pagina], mapa_reglas)[0]:
                     continue
                 else:
                     if u in mapa_reglas.keys():
-                        for j in range(0, i):
+                        for j in range(0, k):
                             if pagina[j] in mapa_reglas[u]:
-                                rotar_elementos(pagina, i, j)
+                                # print(f"Rotando elementos en índices {k} y {j}")
+                                rotar_elementos(pagina, k, j)
                     else:
-                        mover_al_final(pagina, i)
+                        # print(f"Moviendo elemento {u} al final")
+                        mover_al_final(pagina, k)
             paginas_reordenadas.append(pagina)
     return paginas_reordenadas
 
@@ -109,7 +113,7 @@ def mover_al_final(lista, indice):
     return lista
 
 def rotar_elementos(lista, i, j):
-    if 0 <= i < len(lista) - 1:  # Verifica que el índice sea válido
+    if 0 <= i < len(lista) and 0 <= j < len(lista):  # Verifica que ambos índices sean válidos
         lista[i], lista[j] = lista[j], lista[i]
     return lista
 
@@ -159,16 +163,23 @@ reglas, paginas = procesar_txt(txt)
 mapa_reglas = procesar_reglas(reglas)
 updates = procesar_paginas(paginas, mapa_reglas)
 suma_updates_correctos(updates, paginas)
-
-
 paginas_ordenadas = ordenar_updates(paginas, updates, mapa_reglas)
 print("La suma de las paginas reordenadas es: ", suma_updates_reordenados(paginas_ordenadas))
+#%%
+test2 = [[22, 78, 98, 59, 91],
+    [84, 12, 86, 36, 81, 95, 74, 53, 56, 66, 26, 15, 44, 92, 71],
+    [26, 44, 24, 52, 68, 47, 42, 64, 41, 76, 29, 78, 82, 73, 38],
+    [26, 44, 89, 92, 24, 52, 68, 47, 64, 97, 22, 38, 41, 76, 19, 29, 78, 82, 73, 32, 91]
+    ]
+
+u_test = procesar_paginas(test2, mapa_reglas)
+r_test = ordenar_updates(test2, u_test, mapa_reglas)
 #%% parte 1
 txt = leer_txt("input.txt")
 reglas, paginas = procesar_txt(txt)
 mapa_reglas = procesar_reglas(reglas)
 updates = procesar_paginas(paginas, mapa_reglas)
 suma_updates_correctos(updates, paginas)
-
+#parte 2
 paginas_ordenadas = ordenar_updates(paginas, updates, mapa_reglas)
 print("La suma de las paginas reordenadas es: ", suma_updates_reordenados(paginas_ordenadas))
