@@ -104,6 +104,15 @@ def contar_X(mapa):
     conteo = mapa.map(lambda x: str(x).count(letra)).sum().sum()
     return conteo
 
+# parte 2
+# cuando tengo un loop se van a repetir siempre 4 posiciones de inicio
+# entonces si se vuelven a repetir las 4 ultimas posiciones estoy en un loop
+def loop():
+    pass
+
+# para generar un loop tengo que poner un obstaculo de forma que me genere un rectangulo
+def nuevo_obstaculo():
+    pass
 #%% test
 txt = ["....#.....",
        ".........#",
