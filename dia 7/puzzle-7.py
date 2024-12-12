@@ -50,6 +50,9 @@ def calcular_combinaciones(nums):
         
         # Multiplica el siguiente número
         combinar(idx + 1, acumulado * nums[idx], f"({expresion} * {nums[idx]})")
+        
+        # Une el siguiente numero
+        combinar(idx + 1, int(str(acumulado) + str(nums[idx])), f"({expresion}{nums[idx]})")
     
     resultados = []
     if nums:  # Asegurarse de que la lista no esté vacía
