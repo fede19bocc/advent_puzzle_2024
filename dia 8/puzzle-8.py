@@ -34,6 +34,19 @@ def extraer_valores_unicos(txt):
         valores_unicos.update(linea)  # Agrega los caracteres únicos de cada línea
     return sorted(valores_unicos)  # Ordenar los valores únicos (opcional)
 
+def ubicar_antinodo(mapa, antenas):
+    '''
+    Dado un mapa (DataFrame) y una lista de dos tuplas que representan la ubicacion de 
+    dos antenas en el mapa.
+    Devuelve una lista de tuplas con la ubicacion de los antinodos    
+    '''
+    antena1 = antenas[0]
+    antena2 = antenas[1]
+    vector = tuple(map(lambda x ,y: abs(x - y), antena1, antena2))#falta 
+    antinodos = [tuple(map(lambda x ,y: abs(x - y), antena1, antena2)), antena2 + vector]
+    return antinodos
+    
+
 #%% test
 txt = ["............",
        "........0...",
@@ -52,6 +65,8 @@ mapa = procesar_txt(txt)
 elementos = extraer_valores_unicos(txt)
 ceros = ubicar_elemento(mapa, "0")
 a = ubicar_elemento(mapa, "A")
+
+antinodos = ubicar_antinodo(mapa,[a[1], a[2]])
 
 #%% input
 
