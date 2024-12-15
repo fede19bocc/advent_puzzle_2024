@@ -13,7 +13,7 @@ def leer_txt(archivo):
     lista = []
     with open(archivo, "r") as f:
         for line in f.readlines():
-                lista.append(line)
+                lista.append(line.strip())
     return lista
 
 def procesar_txt(txt):
@@ -43,15 +43,15 @@ def ubicar_antinodo(antenas):
     '''
     antena1 = antenas[0]
     antena2 = antenas[1]
-    vector = tuple(map(lambda x ,y: abs(x - y), antena1, antena2)) 
-    antinodos = [tuple(map(lambda x ,y: abs(x - y), antena1, vector)),# primer antinodo
-                 tuple(map(lambda x ,y: abs(x + y), antena2, vector))]# segundo antinodo
+    vector = tuple(map(lambda x ,y: x - y, antena1, antena2)) 
+    antinodos = [tuple(map(lambda x ,y: x + y, antena1, vector)),# primer antinodo
+                 tuple(map(lambda x ,y: x - y, antena2, vector))]# segundo antinodo
     return antinodos
 
-def calcular_combinaciones(antenas):
+def calcular_antinodos(antenas):
     '''
     Dada una entrada que contiene una lista de ubicaciones de antenas y una etiqueta,
-    calcula todas las combinaciones posibles de antinodos generados entre pares consecutivos de antenas.
+    calcula todas las combinaciones posibles de antinodos generados entre pares de antenas.
     Devuelve una lista de tuplas donde cada tupla contiene:
       - La ubicación del antinodo
       - Una descripción de cómo se generó
@@ -61,32 +61,41 @@ def calcular_combinaciones(antenas):
         antenas, etiqueta = antenas  # Extraemos la lista de coordenadas y la etiqueta
     else:
         etiqueta = None  # No hay etiqueta
-        
-    def combinar(idx):
-        # Caso base: no hay más pares para procesar
-        if idx >= len(antenas) - 1:
+
+    # Verificar que hay suficientes antenas
+    if len(antenas) < 2:
+        return [], etiqueta  # No se pueden generar antinodos si hay menos de dos antenas
+
+    # Función recursiva para calcular las combinaciones de antenas
+    def generar_antinodos(indices, start):
+        if len(indices) == 2:  # Condición base: se tienen dos índices seleccionados
+            a, b = indices
+            antena1 = antenas[a]
+            antena2 = antenas[b]
+
+            # Calcular los antinodos entre estas dos antenas usando la función ubicar_antinodo
+            antinodos_generados = ubicar_antinodo([antena1, antena2])
+
+            # Agregar antinodos a la lista con sus descripciones
+            for antinodo in antinodos_generados:
+                antinodos.append(antinodo)
             return
 
-        # Calcular antinodos para el par actual
-        antinodo_actual = ubicar_antinodo([antenas[idx], antenas[idx + 1]])
+        # Recursivamente intentar agregar más índices
+        for i in range(start, len(antenas)):
+            generar_antinodos(indices + [i], i + 1)
 
-        # Guardar resultados con expresiones descriptivas
-        antinodos.append(antinodo_actual[0])
-        antinodos.append(antinodo_actual[1])
-
-        # Continuar con el siguiente par
-        combinar(idx + 1)
-
-    # Inicializar la lista de antinodos
+    # Lista para almacenar los antinodos generados
     antinodos = []
-    
-    # Comenzar el cálculo recursivo
-    if len(antenas) >= 2:
-        combinar(0)
+
+    # Iniciar la recursión para generar combinaciones
+    generar_antinodos([], 0)
 
     return antinodos, etiqueta
 
+
 def encontrar_antinodos_mapa(mapa, elementos):
+    contador_antinodo = 0
     mapa_antinodos = mapa.copy()
     limite_x = len(mapa.columns)
     limite_y = len(mapa)
@@ -97,25 +106,24 @@ def encontrar_antinodos_mapa(mapa, elementos):
     lista_anti = []
     for antena in antenas:
         if antena[1] != ".":
-            antinodo, elemento = calcular_combinaciones(antena)
+            antinodo, elemento = calcular_antinodos(antena)
             lista_anti.append(antinodo)
-    antinodos = []
-    for sublista in lista_anti:
-        antinodos.extend(sublista)
     
+    antinodos = antinodos_unicos(lista_anti)
+    contador_antinodo = 0
     for anti in antinodos:
         x, y = anti
         if -1 < x < limite_x and -1 < y < limite_y:
+            contador_antinodo += 1
             if mapa_antinodos.loc[x, y] == ".":
                 mapa_antinodos.loc[x, y] = "#"
-        
-    return mapa_antinodos
+    return mapa_antinodos, contador_antinodo
 
-def contar_antinodo(mapa):
-    letra = "#"
-    conteo = mapa.map(lambda x: str(x).count(letra)).sum().sum()
-    return conteo
-
+def antinodos_unicos(lista_antinodos):
+    antinodos = set()
+    for lista in lista_antinodos:
+        antinodos.update(lista)
+    return list(antinodos)
 #%% test
 txt = ["............",
        "........0...",
@@ -132,15 +140,26 @@ txt = ["............",
 
 mapa = procesar_txt(txt)
 elementos = extraer_valores_unicos(txt)
-# ceros = ubicar_elemento(mapa, "0")
-# a = ubicar_elemento(mapa, "A")
 
-# antinodos = calcular_combinaciones(ceros)
-mapa_antinodos = encontrar_antinodos_mapa(mapa, elementos)
-conteo =contar_antinodo(mapa_antinodos)
+
+mapa_antinodos, contador_antinodo = encontrar_antinodos_mapa(mapa, elementos)
+ # =contar_antinodo(mapa_antinodos)
 #%%
-u = ubicar_antinodo([ceros[0][1], ceros[0][0]])
+ceros = ubicar_elemento(mapa, "0")
+a = ubicar_elemento(mapa, "A")
+
+anti_a = calcular_antinodos(a)
+anti_c = calcular_antinodos(ceros)
+
+anti1=ceros[0][3]
+anti2=ceros[0][0]
+u = ubicar_antinodo([anti1, anti2])
 
 #%% input
 
 txt = leer_txt("input.txt")
+mapa = procesar_txt(txt)
+elementos = extraer_valores_unicos(txt)
+
+
+mapa_antinodos, contador_antinodo = encontrar_antinodos_mapa(mapa, elementos)
