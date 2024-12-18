@@ -82,15 +82,53 @@ def checksum(disco_ordenado):
         if valor != ".":
             suma += i*int(valor)
     return suma
+
+# parte 2
+
+def ordenar_bloque_enteros(memoria):
+    memoria_ordenada = memoria.copy()
+    ultimo_libre = 0  # Posición del último espacio libre encontrado
+    
+    for i, bloque in reversed(list(enumerate(memoria))):
+        if i < ultimo_libre:
+            break
+        if type(bloque) == tuple:  # Si encontramos un bloque de datos
+            while ultimo_libre < len(memoria) and type(memoria_ordenada[ultimo_libre]) == tuple:
+                ultimo_libre += 1  # Encontrar el siguiente espacio libre
+            if ultimo_libre < len(memoria) and ultimo_libre < i:
+                ultimo_libre_entero = ultimo_libre #asigo el espacio libre al espacio libre entero.
+                # busco un espacio libre donde entre un bloque entero.
+                if memoria_ordenada[ultimo_libre_entero] < memoria[i][1]:
+                    continuar= True
+                    while ultimo_libre_entero < len(memoria) and continuar:
+                        if type(memoria_ordenada[ultimo_libre_entero])==int and memoria_ordenada[ultimo_libre_entero] >= memoria[i][1]:
+                            continuar = False
+                        else:
+                            ultimo_libre_entero += 1
+                if ultimo_libre_entero < len(memoria) and memoria_ordenada[ultimo_libre_entero] >= memoria[i][1]:
+                    espacio_libre = memoria_ordenada[ultimo_libre_entero] 
+                    memoria_ordenada[ultimo_libre_entero] = espacio_libre - memoria[i][1]
+                    memoria_ordenada.remove(memoria[i])
+                    memoria_ordenada.insert(ultimo_libre_entero, memoria[i])
+                    memoria_ordenada.insert(i, espacio_libre)
+                    # if memoria_ordenada[ultimo_libre] != 0:
+                    #     ultimo_libre += 1
+    
+    return memoria_ordenada
+
 #%% test
-# txt = ["12345"]
-txt = ["233313312141413140211"] # checksum()= 2132
+# txt = ["13412111"]
+txt = ["2333133121414131402"] # checksum()= 2132
 memoria = procesar_txt(txt)
 disco = generar_disco(memoria)
 
 disco_ordenado = ordenar_disco(disco) # para cadenas cortar sirve
 # disco_ordenado = ordenar_disco_optimizado(disco)
 suma = checksum(disco_ordenado)
+# parte 2
+memoria_ordenada = ordenar_bloque_enteros(memoria)
+disco_ordenado_por_bloques = generar_disco(memoria_ordenada)
+suma_orden_bloques = checksum(disco_ordenado_por_bloques)
 #%% parte 1
 txt = leer_txt("input.txt")
 memoria = procesar_txt(txt)
